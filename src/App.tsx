@@ -10,10 +10,55 @@ const App: React.FC = () => {
   const { landmarks, isReady } = useFaceDetection(videoRef);
   const [intensity, setIntensity] = useState(0.5);
   const [targetGender, setTargetGender] = useState<'male' | 'female'>('female');
+  const [usePythonBackend, setUsePythonBackend] = useState(false);
+  const [useAIModel, setUseAIModel] = useState(false);
+  const [pythonImage, setPythonImage] = useState<string | null>(null);
+  const socketRef = React.useRef<WebSocket | null>(null);
 
   useEffect(() => {
     startWebcam();
   }, [startWebcam]);
+
+  useEffect(() => {
+    if (usePythonBackend) {
+      // Connect to WebSocket
+      const ws = new WebSocket('ws://localhost:8000/ws');
+      ws.onopen = () => console.log('Connected to Python Backend');
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.processed) {
+          setPythonImage(data.processed);
+        }
+      };
+      socketRef.current = ws;
+
+      const interval = setInterval(() => {
+        if (videoRef.current && socketRef.current?.readyState === WebSocket.OPEN) {
+          const canvas = document.createElement('canvas');
+          canvas.width = videoRef.current.videoWidth;
+          canvas.height = videoRef.current.videoHeight;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(videoRef.current, 0, 0);
+            const base64 = canvas.toDataURL('image/jpeg', 0.8);
+            socketRef.current.send(JSON.stringify({
+              image: base64,
+              gender: targetGender,
+              intensity: intensity,
+              use_ai_model: useAIModel
+            }));
+          }
+        }
+      }, useAIModel ? 200 : 50);
+
+      return () => {
+        clearInterval(interval);
+        ws.close();
+      };
+    } else {
+      setPythonImage(null);
+    }
+  }, [usePythonBackend, targetGender, intensity, useAIModel]);
 
   return (
     <div className="app-container">
@@ -26,6 +71,9 @@ const App: React.FC = () => {
           <span className={`status-pill ${isReady ? 'ready' : 'loading'}`}>
             {isReady ? 'System Ready' : 'Initializing AI...'}
           </span>
+          {usePythonBackend && (
+            <span className="status-pill ready" style={{ color: '#6366f1' }}>Python Active</span>
+          )}
         </div>
       </header>
 
@@ -36,13 +84,19 @@ const App: React.FC = () => {
             autoPlay
             playsInline
             muted
-            className="hidden-video"
+            className={usePythonBackend ? "hidden-video" : "hidden-video"}
+            style={{ opacity: 1 }}
           />
-          <TransformationCanvas
-            landmarks={landmarks}
-            transformationIntensity={intensity}
-            targetGender={targetGender}
-          />
+          {usePythonBackend && pythonImage ? (
+            <img src={pythonImage} alt="Processed" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute' }} />
+          ) : (
+            <TransformationCanvas
+              landmarks={landmarks}
+              transformationIntensity={intensity}
+              targetGender={targetGender}
+              videoRef={videoRef}
+            />
+          )}
 
           {!isReady && (
             <div className="loading-overlay">
@@ -94,6 +148,35 @@ const App: React.FC = () => {
                 value={intensity}
                 onChange={(e) => setIntensity(parseFloat(e.target.value))}
               />
+            </div>
+            <div className="control-item">
+              <label>Processing Mode</label>
+              <div className="gender-switch">
+                <button
+                  className={!usePythonBackend ? 'active' : ''}
+                  onClick={() => setUsePythonBackend(false)}
+                >
+                  Client (WebGL)
+                </button>
+                <button
+                  className={usePythonBackend && !useAIModel ? 'active' : ''}
+                  onClick={() => {
+                    setUsePythonBackend(true);
+                    setUseAIModel(false);
+                  }}
+                >
+                  Geo Morph
+                </button>
+                <button
+                  className={usePythonBackend && useAIModel ? 'active' : ''}
+                  onClick={() => {
+                    setUsePythonBackend(true);
+                    setUseAIModel(true);
+                  }}
+                >
+                  AI Swap (ONNX)
+                </button>
+              </div>
             </div>
           </section>
 

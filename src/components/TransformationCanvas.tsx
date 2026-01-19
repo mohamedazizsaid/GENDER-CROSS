@@ -7,12 +7,14 @@ interface TransformationCanvasProps {
     landmarks: any;
     transformationIntensity: number;
     targetGender: 'male' | 'female';
+    videoRef: React.RefObject<HTMLVideoElement | null>;
 }
 
 export const TransformationCanvas: React.FC<TransformationCanvasProps> = ({
     landmarks,
     transformationIntensity,
-    targetGender
+    targetGender,
+    videoRef
 }) => {
     return (
         <div className="TransformationCanvas-container">
@@ -27,6 +29,7 @@ export const TransformationCanvas: React.FC<TransformationCanvasProps> = ({
                             landmarks={landmarks}
                             transformationIntensity={transformationIntensity}
                             targetGender={targetGender}
+                            videoRef={videoRef}
                         />
                     )}
                 </Suspense>
