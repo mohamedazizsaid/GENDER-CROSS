@@ -25,6 +25,13 @@ export const useFaceDetection = (videoRef: React.RefObject<HTMLVideoElement | nu
 
         const video = videoRef.current;
         if (video.readyState < 2) {
+            // Only log sparingly if needed, otherwise it's too noisy
+            requestRef.current = requestAnimationFrame(detect);
+            return;
+        }
+
+        if (video.videoWidth <= 2) {
+            console.warn("Video dimension is still too small:", video.videoWidth, "x", video.videoHeight);
             requestRef.current = requestAnimationFrame(detect);
             return;
         }
@@ -35,7 +42,18 @@ export const useFaceDetection = (videoRef: React.RefObject<HTMLVideoElement | nu
         const timestamp = performance.now();
         const detectionResult = faceService.detect(video, timestamp);
 
+        if (detectionResult) {
+            console.log("Detection result keys:", Object.keys(detectionResult));
+            if (detectionResult.faceLandmarks) {
+                console.log("Face landmarks count:", detectionResult.faceLandmarks.length);
+                if (detectionResult.faceLandmarks.length > 0) {
+                    console.log("First landmark sample:", detectionResult.faceLandmarks[0][0]);
+                }
+            }
+        }
+
         if (detectionResult && detectionResult.faceLandmarks.length > 0) {
+            if (!landmarks) console.log("First face landmarks detected!");
             setLandmarks(detectionResult.faceLandmarks[0]);
 
             // Gender detection can be less frequent for performance
@@ -45,6 +63,9 @@ export const useFaceDetection = (videoRef: React.RefObject<HTMLVideoElement | nu
                     setGender({ gender: gResult.gender, probability: gResult.genderProbability });
                 }
             }
+        } else if (Math.random() > 0.99) {
+            // Sparsely log when no faces are found to avoid console flooding
+            console.log("No faces detected in current frame...");
         }
 
         requestRef.current = requestAnimationFrame(detect);

@@ -1,8 +1,8 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWebcam } from './hooks/useWebcam';
 import { useFaceDetection } from './hooks/useFaceDetection';
 import { TransformationCanvas } from './components/TransformationCanvas';
-import { Settings, Camera, Zap, User, UserCheck } from 'lucide-react';
+import { Settings, Zap, User, UserCheck } from 'lucide-react';
 import './App.css';
 
 const App: React.FC = () => {
@@ -53,6 +53,12 @@ const App: React.FC = () => {
             <div className="loading-overlay">
               <div className="loader"></div>
               <p>Loading Deep Learning Models...</p>
+            </div>
+          )}
+
+          {isReady && !landmarks && !webcamError && (
+            <div className="no-face-overlay">
+              <p>No Face Detected. Please look at the camera.</p>
             </div>
           )}
 

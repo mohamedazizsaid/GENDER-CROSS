@@ -20,7 +20,6 @@ export const FaceMesh: React.FC<FaceMeshProps> = ({ landmarks, transformationInt
     const geometryRef = useRef<THREE.BufferGeometry>(null);
 
     const positions = useMemo(() => new Float32Array(468 * 3), []);
-    const uvs = useMemo(() => new Float32Array(468 * 2), []);
 
     useFrame(() => {
         if (!landmarks || !geometryRef.current) return;
@@ -74,17 +73,13 @@ export const FaceMesh: React.FC<FaceMeshProps> = ({ landmarks, transformationInt
             <bufferGeometry ref={geometryRef}>
                 <bufferAttribute
                     attach="attributes-position"
-                    count={positions.length / 3}
-                    array={positions}
-                    itemSize={3}
+                    args={[positions, 3]}
                 />
                 {/* We'll use the triangulation if provided, otherwise wireframe for now */}
                 {TRIANGULATION.length > 0 && (
                     <bufferAttribute
                         attach="index"
-                        count={TRIANGULATION.length}
-                        array={TRIANGULATION}
-                        itemSize={1}
+                        args={[TRIANGULATION, 1]}
                     />
                 )}
             </bufferGeometry>

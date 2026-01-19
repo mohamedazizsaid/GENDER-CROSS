@@ -60,7 +60,8 @@ body {
   gap: 1rem;
 }
 
-.status-pill, .gender-pill {
+.status-pill,
+.gender-pill {
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   font-size: 0.75rem;
@@ -68,9 +69,20 @@ body {
   text-transform: uppercase;
 }
 
-.status-pill.ready { background: rgba(16, 185, 129, 0.1); color: var(--ready-color); }
-.status-pill.loading { background: rgba(245, 158, 11, 0.1); color: var(--loading-color); }
-.gender-pill { background: rgba(99, 102, 241, 0.1); color: var(--accent-color); }
+.status-pill.ready {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--ready-color);
+}
+
+.status-pill.loading {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--loading-color);
+}
+
+.gender-pill {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--accent-color);
+}
 
 .viewport-container {
   flex: 1;
@@ -89,7 +101,8 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.2; /* Show slightly as background */
+  opacity: 0.5;
+  /* Show more clearly as background */
 }
 
 .controls-panel {
@@ -156,11 +169,6 @@ body {
   box-shadow: 0 4px 12px var(--accent-glow);
 }
 
-input[type="range"] {
-  width: 100%;
-  accent-color: var(--accent-color);
-}
-
 .info-panel {
   margin-top: auto;
   padding-top: 1.5rem;
@@ -174,9 +182,12 @@ input[type="range"] {
   margin-bottom: 0.5rem;
 }
 
-.stat-item span:first-child { color: var(--text-secondary); }
+.stat-item span:first-child {
+  color: var(--text-secondary);
+}
 
-.loading-overlay, .error-overlay {
+.loading-overlay,
+.error-overlay {
   position: absolute;
   inset: 0;
   display: flex;
@@ -199,6 +210,30 @@ input[type="range"] {
 }
 
 @keyframes rotation {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.no-face-overlay {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border-color);
+  z-index: 15;
+}
+
+.no-face-overlay p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
 }

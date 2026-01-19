@@ -17,7 +17,18 @@ export const useWebcam = () => {
             });
             setStream(mediaStream);
             if (videoRef.current) {
-                videoRef.current.srcObject = mediaStream;
+                const video = videoRef.current;
+                video.srcObject = mediaStream;
+
+                // Explicitly call play and handle potential promise
+                video.onloadedmetadata = () => {
+                    console.log(`Webcam metadata loaded: ${video.videoWidth}x${video.videoHeight}`);
+                    video.play().catch(e => console.error("Error playing video:", e));
+                };
+
+                video.onplay = () => {
+                    console.log("Webcam video started playing");
+                };
             }
         } catch (err) {
             setError('Failed to access webcam. Please ensure camera permissions are granted.');
