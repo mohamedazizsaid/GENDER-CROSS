@@ -16,25 +16,21 @@ export const useWebcam = () => {
                 audio: false
             });
             setStream(mediaStream);
-            if (videoRef.current) {
-                const video = videoRef.current;
-                video.srcObject = mediaStream;
-
-                // Explicitly call play and handle potential promise
-                video.onloadedmetadata = () => {
-                    console.log(`Webcam metadata loaded: ${video.videoWidth}x${video.videoHeight}`);
-                    video.play().catch(e => console.error("Error playing video:", e));
-                };
-
-                video.onplay = () => {
-                    console.log("Webcam video started playing");
-                };
-            }
         } catch (err) {
             setError('Failed to access webcam. Please ensure camera permissions are granted.');
             console.error('Webcam access error:', err);
         }
     }, []);
+
+    useEffect(() => {
+        const video = videoRef.current;
+        if (video && stream) {
+            video.srcObject = stream;
+            video.onloadedmetadata = () => {
+                video.play().catch(e => console.error("Video play error:", e));
+            };
+        }
+    }, [stream]);
 
     const stopWebcam = useCallback(() => {
         if (stream) {

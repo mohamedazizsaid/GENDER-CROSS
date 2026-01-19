@@ -7,7 +7,7 @@ import './App.css';
 
 const App: React.FC = () => {
   const { videoRef, startWebcam, error: webcamError } = useWebcam();
-  const { landmarks, gender, isReady } = useFaceDetection(videoRef);
+  const { landmarks, isReady } = useFaceDetection(videoRef);
   const [intensity, setIntensity] = useState(0.5);
   const [targetGender, setTargetGender] = useState<'male' | 'female'>('female');
 
@@ -26,11 +26,6 @@ const App: React.FC = () => {
           <span className={`status-pill ${isReady ? 'ready' : 'loading'}`}>
             {isReady ? 'System Ready' : 'Initializing AI...'}
           </span>
-          {gender && (
-            <span className="gender-pill">
-              Detected: {gender.gender} ({Math.round(gender.probability * 100)}%)
-            </span>
-          )}
         </div>
       </header>
 

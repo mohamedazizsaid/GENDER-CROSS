@@ -15,8 +15,8 @@ export const TransformationCanvas: React.FC<TransformationCanvasProps> = ({
     targetGender
 }) => {
     return (
-        <div style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}>
-            <Canvas>
+        <div className="TransformationCanvas-container">
+            <Canvas gl={{ alpha: true }}>
                 <PerspectiveCamera makeDefault position={[0, 0, 2]} />
                 <ambientLight intensity={0.5} />
                 <pointLight position={[10, 10, 10]} />
