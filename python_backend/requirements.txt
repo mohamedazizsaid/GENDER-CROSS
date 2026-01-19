@@ -1,0 +1,11 @@
+opencv-python 
+mediapipe 
+numpy 
+flask 
+flask-cors 
+fastapi 
+uvicorn 
+python-multipart
+insightface 
+onnxruntime
+opencv-contrib-python
